@@ -1,0 +1,14 @@
+Package: BrokenAdaptiveRidge
+Type: Package
+Title: Broken adaptive ridge extensions to Cyclop
+Version: 0.1.0
+Author: Marc A. Suchard [aut, cre],
+  Eric Kawaguchi [aut],
+  Ning Li [aut],
+  Gang Li [aut]
+Maintainer: Marc A. Suchard <msuchard@ucla.edu>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
