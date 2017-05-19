@@ -88,7 +88,8 @@ script:
   - R CMD build .
   - _R_CHECK_CRAN_INCOMING_=FALSE R CMD check "${PKG_TARBALL}" --as-cran
   - cat ${PKG_NAME}.Rcheck/00install.out # Print out install / compile log 
-
+  - cat ${PKG_NAME}.Rcheck/00check.out
+  
 after_success:
   - Rscript -e 'covr::codecov()'
   # Rebuild docker container
