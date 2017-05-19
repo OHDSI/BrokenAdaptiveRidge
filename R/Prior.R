@@ -26,7 +26,12 @@
 #'
 #' @param penalty        Specifies the BAR penalty; possible values are `BIC` or `AIC` or a numeric value
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior
-#' @param forceIntercept Logical: Force intercept coefficient into prior
+#' @param forceIntercept Logical: Force intercept coefficient into regularization
+#' @param fitBestSubset  Logical: Fit final subset with no regularization
+#' @param initialRidgeVariance Numeric: variance used for algorithm initiation
+#' @param tolerance Numeric: maximum abs change in coefficient estimates from successive iterations to achieve convergence
+#' @param maxIterations Numeric: maxium iterations to achieve convergence
+#' @param threshold  Numeric: absolute threshold at which to force coefficient to 0
 #'
 #' @examples
 #' prior <- createBarPrior(penalty = "bic")
@@ -35,93 +40,166 @@
 #' A BAR Cyclops prior object of class inheriting from
 #' \code{"cyclopsPrior"} for use with \code{fitCyclopsModel}.
 #'
+#' @import Cyclops
+#'
 #' @export
 createBarPrior <- function(penalty = "bic",
-                               exclude = c(),
-                               forceIntercept = FALSE) {
+                           exclude = c(),
+                           forceIntercept = FALSE,
+                           fitBestSubset = FALSE,
+                           initialRidgeVariance = 1E4,
+                           tolerance = 1E-8,
+                           maxIterations = 1E4,
+                           threshold = 1E-6) {
 
-    # TODO Check that penalty is valid
+    # TODO Check that penalty (and other arguments) is valid
+
+    fitHook <- function(...) {
+      # closure to capture BAR parameters
+      barHook(fitBestSubset, initialRidgeVariance, tolerance, maxIterations, threshold, ...)
+    }
 
     structure(list(penalty = penalty,
                    exclude = exclude,
-                   forceIntercept = forceIntercept),
+                   forceIntercept = forceIntercept,
+                   fitHook = fitHook),
               class = "cyclopsPrior")
 }
 
 # Below are package-private functions
 
-barHook <- function(cyclopsData,
-                       barPrior,
-                       control,
-                       weights,
-                       forceNewObject,
-                       returnEstimates,
-                       startingCoefficients,
-                       fixedCoefficients) {
+barHook <- function(fitBestSubset,
+                    initialRidgeVariance,
+                    tolerance,
+                    maxIterations,
+                    cutoff,
+                    cyclopsData,
+                    barPrior,
+                    control,
+                    weights,
+                    forceNewObject,
+                    returnEstimates,
+                    startingCoefficients,
+                    fixedCoefficients) {
 
-    # TODO Pass as parameters
-    tol <- 1E-8
-    cutoff <- 1E-16
-    maxIterations <- 100
+  # Getting starting values
+  startFit <- Cyclops::fitCyclopsModel(cyclopsData, prior = createBarStartingPrior(cyclopsData,
+                                                                                   exclude = barPrior$exclude,
+                                                                                   forceIntercept = barPrior$forceIntercept,
+                                                                                   initialRidgeVariance = initialRidgeVariance),
+                                       control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
 
-    # Getting starting values
-    startFit <- fitCyclopsModel(cyclopsData, prior = createBarStartingPrior(cyclopsData, control),
-                                control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
+  priorType <- createBarPriorType(cyclopsData, barPrior$exclude, barPrior$forceIntercept)
+  include <- setdiff(c(1:Cyclops::getNumberOfCovariates(cyclopsData)), priorType$exclude)
 
-    ridge <- rep("normal", getNumberOfCovariates(cyclopsData)) # TODO Handle intercept
-    pre_coef <- coef(startFit)
-    penalty <- getPenalty(cyclopsData, barPrior)
+  pre_coef <- coef(startFit)
+  penalty <- getPenalty(cyclopsData, barPrior)
 
-    continue <- TRUE
-    count <- 0
-    converged <- FALSE
+  continue <- TRUE
+  count <- 0
+  converged <- FALSE
 
-    while (continue) {
-        count <- count + 1
+  while (continue) {
+    count <- count + 1
 
-        working_coef <- ifelse(abs(pre_coef) < cutoff, 0.0, pre_coef)
-        fixed <- working_coef == 0.0
-        variance <- (working_coef) ^ 2 / penalty
+    working_coef <- ifelse(abs(pre_coef) <= cutoff, 0.0, pre_coef)
+    fixed <- working_coef == 0.0
+    variance <- (working_coef) ^ 2 / penalty
 
-        prior <- createPrior(ridge, variance = variance)
-        fit <- fitCyclopsModel(cyclopsData,
-                               prior = prior,
-                               control, weights, forceNewObject,
-                               startingCoefficients = working_coef,
-                               fixedCoefficients = fixed)
-
-        coef <- coef(fit)
-        if (max(abs(coef - pre_coef)) < tol) {
-            converged <- TRUE
-        } else {
-            pre_coef <- coef
-        }
-
-        if (converged || count >= maxIterations) {
-            continue <- FALSE
-        }
+    if (!is.null(priorType$exclude)) {
+      working_coef[priorType$exclude] <- pre_coef[priorType$exclude]
+      fixed[priorType$exclude] <- FALSE
+      variance[priorType$exclude] <- 0
     }
 
-    class(fit) <- c(class(fit), "cyclopsBarFit")
-    fit$barConverged <- converged
-    fit$barIterations <- count
-    fit$barFinalPriorVariance <- variance
+    prior <- Cyclops::createPrior(priorType$types, variance = variance)
+    fit <- Cyclops::fitCyclopsModel(cyclopsData,
+                                    prior = prior,
+                                    control, weights, forceNewObject,
+                                    startingCoefficients = working_coef,
+                                    fixedCoefficients = fixed)
 
-    return(fit)
+    coef <- coef(fit)
+
+    if (max(abs(coef - pre_coef)) < tolerance) {
+      converged <- TRUE
+    } else {
+      pre_coef <- coef
+    }
+
+    if (converged || count >= maxIterations) {
+      continue <- FALSE
+    }
+  }
+
+  if (count >= maxIterations) {
+    stop(paste0('Algorithm did not converge after ',
+                maxIterations, ' iterations.',
+                ' Estimates may not be stable.'))
+  }
+
+  if (fitBestSubset) {
+    fit <- Cyclops::fitCyclopsModel(cyclopsData, prior = createPrior("none"),
+                                    control, weights, forceNewObject, fixedCoefficients = fixed)
+  }
+
+  class(fit) <- c(class(fit), "cyclopsBarFit")
+  fit$barConverged <- converged
+  fit$barIterations <- count
+  fit$barFinalPriorVariance <- variance
+
+  return(fit)
 }
 
-createBarStartingPrior <- function(cyclopsData, control) {  # TODO Better starting choices
-    if (getNumberOfRows(cyclopsData) < control$minCVData) {
-        createPrior("normal", variance = 10)
+createBarStartingPrior <- function(cyclopsData,
+                                   exclude,
+                                   forceIntercept,
+                                   initialRidgeVariance) {
+
+  Cyclops::createPrior("normal", variance = initialRidgeVariance, exclude = exclude, forceIntercept = forceIntercept)
+}
+
+createBarPriorType <- function(cyclopsData,
+                               exclude,
+                               forceIntercept) {
+
+  exclude <- Cyclops:::.checkCovariates(cyclopsData, exclude)
+
+  if (Cyclops:::.cyclopsGetHasIntercept(cyclopsData) && !forceIntercept) {
+    interceptId <- Cyclops:::.cyclopsGetInterceptLabel(cyclopsData)
+    warn <- FALSE
+    if (is.null(exclude)) {
+      exclude <- c(interceptId)
+      warn <- TRUE
     } else {
-        createPrior("normal", useCrossValidation = TRUE)
+      if (!interceptId %in% exclude) {
+        exclude <- c(interceptId, exclude)
+        warn <- TRUE
+      }
     }
+    if (warn) {
+      warning("Excluding intercept from regularization")
+    }
+  }
+
+  types <- rep("normal", Cyclops::getNumberOfCovariates(cyclopsData))
+  if (!is.null(exclude)) {
+    types[exclude] <- "none"
+  }
+
+  list(types = types,
+       exclude = exclude)
 }
 
 getPenalty <- function(cyclopsData, barPrior) {
-    if (barPrior$penalty == "bic") {
-        return(log(getNumberOfRows(cyclopsData))) # TODO Handle stratified models
-    } else {
-        stop("Unhandled BAR penalty type")
-    }
+
+  if (is.numeric(barPrior$penalty)) {
+    return(barPrior$penalty)
+  }
+
+  if (barPrior$penalty == "bic") {
+    return(log(Cyclops::getNumberOfRows(cyclopsData)) / 2) # TODO Handle stratified models
+  } else {
+    stop("Unhandled BAR penalty type")
+  }
 }
