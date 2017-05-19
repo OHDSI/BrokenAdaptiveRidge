@@ -1,8 +1,8 @@
-# @file Abridge.R
+# @file Prior.R
 #
-# Copyright 2016 Observational Health Data Sciences and Informatics
+# Copyright 2017 Observational Health Data Sciences and Informatics
 #
-# This file is part of cyclops
+# This file is part of BrokenAdaptiveRidge
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,24 +19,24 @@
 # @author Marc A. Suchard
 # @author Ning Li
 
-#' @title Create an ABRIDGE Cyclops prior object
+#' @title Create a BAR Cyclops prior object
 #'
 #' @description
-#' \code{createAbridgePrior} creates an ABRIDGE Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
+#' \code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
 #'
-#' @param penalty        Specifies the ABRIDGE penalty; possible values are `BIC` or `AIC` or a numeric value
+#' @param penalty        Specifies the BAR penalty; possible values are `BIC` or `AIC` or a numeric value
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior
 #' @param forceIntercept Logical: Force intercept coefficient into prior
 #'
 #' @examples
-#' prior <- createAbridgePrior(penalty = "bic")
+#' prior <- createBarPrior(penalty = "bic")
 #'
 #' @return
-#' An ABRIDGE Cyclops prior object of class inheriting from \code{"cyclopsAbridgePrior"}
-#' and \code{"cyclopsPrior"} for use with \code{fitCyclopsModel}.
+#' A BAR Cyclops prior object of class inheriting from
+#' \code{"cyclopsPrior"} for use with \code{fitCyclopsModel}.
 #'
 #' @export
-createAbridgePrior <- function(penalty = "bic",
+createBarPrior <- function(penalty = "bic",
                                exclude = c(),
                                forceIntercept = FALSE) {
 
@@ -45,13 +45,13 @@ createAbridgePrior <- function(penalty = "bic",
     structure(list(penalty = penalty,
                    exclude = exclude,
                    forceIntercept = forceIntercept),
-              class = c("cyclopsPrior","cyclopsAbridgePrior"))
+              class = "cyclopsPrior")
 }
 
 # Below are package-private functions
 
-fitAbridge <- function(cyclopsData,
-                       abridgePrior,
+barHook <- function(cyclopsData,
+                       barPrior,
                        control,
                        weights,
                        forceNewObject,
@@ -65,12 +65,12 @@ fitAbridge <- function(cyclopsData,
     maxIterations <- 100
 
     # Getting starting values
-    startFit <- fitCyclopsModel(cyclopsData, prior = createAbridgeStartingPrior(cyclopsData, control),
+    startFit <- fitCyclopsModel(cyclopsData, prior = createBarStartingPrior(cyclopsData, control),
                                 control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
 
     ridge <- rep("normal", getNumberOfCovariates(cyclopsData)) # TODO Handle intercept
     pre_coef <- coef(startFit)
-    penalty <- getPenalty(cyclopsData, abridgePrior)
+    penalty <- getPenalty(cyclopsData, barPrior)
 
     continue <- TRUE
     count <- 0
@@ -102,14 +102,15 @@ fitAbridge <- function(cyclopsData,
         }
     }
 
-    class(fit) <- c(class(fit), "cyclopsAbridgeFit")
-    fit$abridgeConverged <- converged
-    fit$abridgeIterations <- count
-    fit$abridgeFinalPriorVariance <- variance
-    fit
+    class(fit) <- c(class(fit), "cyclopsBarFit")
+    fit$barConverged <- converged
+    fit$barIterations <- count
+    fit$barFinalPriorVariance <- variance
+
+    return(fit)
 }
 
-createAbridgeStartingPrior <- function(cyclopsData, control) {  # TODO Better starting choices
+createBarStartingPrior <- function(cyclopsData, control) {  # TODO Better starting choices
     if (getNumberOfRows(cyclopsData) < control$minCVData) {
         createPrior("normal", variance = 10)
     } else {
@@ -117,10 +118,10 @@ createAbridgeStartingPrior <- function(cyclopsData, control) {  # TODO Better st
     }
 }
 
-getPenalty <- function(cyclopsData, abridgePrior) {
-    if (abridgePrior$penalty == "bic") {
+getPenalty <- function(cyclopsData, barPrior) {
+    if (barPrior$penalty == "bic") {
         return(log(getNumberOfRows(cyclopsData))) # TODO Handle stratified models
     } else {
-        stop("Unhandled ABRIDGE penalty type")
+        stop("Unhandled BAR penalty type")
     }
 }
