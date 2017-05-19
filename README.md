@@ -1,7 +1,9 @@
 BrokenAdaptiveRidge
 =======
 
+<!--
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/Cyclops)](https://CRAN.R-project.org/package=Cyclops)
+-->
 
 Introduction
 ============
@@ -28,7 +30,7 @@ Dependencies
 Getting Started
 ===============
 1. On Windows, make sure [RTools](https://CRAN.R-project.org/bin/windows/Rtools/) is installed.
-2. In R, use the following commands to download and install Cyclops:
+2. In R, use the following commands to download and install BrokenAdaptiveRidge:
 
   ```r
   install.packages("devtools")
@@ -47,7 +49,7 @@ Getting Started
  
 Getting Involved
 ================
-* Package manual: [Cyclops manual](https://raw.githubusercontent.com/OHDSI/Cyclops/master/extras/Cyclops.pdf) 
+* Package manual: [BrokenAdaptiveRidge manual](https://raw.githubusercontent.com/OHDSI/BrokenAdaptiveRidge/master/extras/BrokenAdaptiveRidge.pdf) 
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
 * We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
  
@@ -61,8 +63,8 @@ BrokenAdaptiveRidge is being developed in R Studio.
 
 ### Development status
 
-[![Build Status](https://travis-ci.org/OHDSI/Cyclops.svg?branch=master)](https://travis-ci.org/OHDSI/Cyclops)
-[![codecov.io](https://codecov.io/github/OHDSI/Cyclops/coverage.svg?branch=master)](https://codecov.io/github/OHDSI/Cyclops?branch=master)
+[![Build Status](https://travis-ci.org/OHDSI/BrokenAdaptiveRidge.svg?branch=master)](https://travis-ci.org/OHDSI/BrokenAdaptiveRidge)
+[![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=master)](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=master)
 
 Beta
 
