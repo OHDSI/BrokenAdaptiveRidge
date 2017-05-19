@@ -61,3 +61,28 @@ test_that("BAR simulated logistic regression - with intercept", {
   glm <- glm(y ~ x[,non_zero], family = binomial())
   expect_equal(as.vector(coef(bar)[which(coef(bar) != 0.0)]), as.vector(coef(glm)), tolerance = 1E-6)
 })
+
+test_that("BAR simulated logistic regression - no convergence", {
+  set.seed(666)
+  p <- 20
+  n <- 1000
+
+  beta1 <- c(0.5, 0, 0, -1, 1.2)
+  beta2 <- seq(0, 0, length = p - length(beta1))
+  beta <- c(beta1,beta2)
+
+  x <- matrix(rnorm(p * n, mean = 0, sd = 1), ncol = p)
+
+  exb <- exp(x %*% beta)
+  prob <- exb / (1 + exb)
+  y <- rbinom(n, 1, prob)
+
+  cyclopsData <- createCyclopsData(y ~ x,modelType = "lr")
+
+  expect_error(
+    bar <- fitCyclopsModel(cyclopsData, prior = createBarPrior("bic", exclude = "(Intercept)", fitBestSubset = TRUE,
+                                                               maxIterations = 1),
+                           control = createControl(noiseLevel = "silent")),
+    "Algorithm did not converge"
+  )
+})
