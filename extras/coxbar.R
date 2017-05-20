@@ -1,19 +1,20 @@
 coxbar <- function(t, delta, X, sparseX = FALSE, COO = NULL, cyclopsForm = NULL, exclude = NULL,
-                   lambda = 1, xi = 2, d = 0, max.iter = 1E4, tol = 1E-6, eps = 1E-6, scale = F){
+                   lambda = 1, xi = 2, d = 0, max.iter = 1E4, tol = 1E-6, eps = 1E-6, scale = F,
+                   old = FALSE){
 
   if(scale == T) {
     beta.sd <- apply(X, 2, sd, na.rm = TRUE)
     X <- scale(X, center = FALSE, scale = apply(X, 2, sd, na.rm = TRUE))
     }
-  
+
   # ----- Values of 0 for xi and lambda:
   lambda <- ifelse(lambda == 0, 1E-8, lambda)
   xi     <- ifelse(xi == 0, 1E-8, xi)
-  
+
   # ----- If the data is already a Cyclops Env. via createCyclopsData
   if(is.null(cyclopsForm) == TRUE) {
     if(is.null(COO) == FALSE) {
-      # ----- If data matrix is in COO form (rowId, covariateId, covariateValue): 
+      # ----- If data matrix is in COO form (rowId, covariateId, covariateValue):
       outcomes <- data.frame(rowId = 1:length(t), time = t, y = delta)
       barData  <- convertToCyclopsData(outcomes, COO, modelType = "cox")
     } else if(sparseX == FALSE) {
@@ -27,26 +28,50 @@ coxbar <- function(t, delta, X, sparseX = FALSE, COO = NULL, cyclopsForm = NULL,
     # ----- If data is already a Cyclops Object
     barData <- cyclopsForm
   }
-  
-  
-  ridge.prior <- createPrior("normal", variance = 1/xi)
-  if(is.null(exclude) == FALSE) {
-    ridge.prior$exclude = exclude
+
+  if (old) {
+    ridge.prior <- createPrior("normal", variance = 1/xi)
+    if(is.null(exclude) == FALSE) {
+      ridge.prior$exclude = exclude
+    }
+
+    ridgeFit <- fitCyclopsModel(barData, prior = ridge.prior) #fit initial ridge regression
+    beta0    <- coef(ridgeFit) #store beta0
+
+    #----- Run iterative BAR method
+    full.fit <- bar_fit(barData, beta0, lambda = lambda, d = d, exclude = exclude,
+                        max.iter = max.iter, tol = tol, eps = eps, scale = scale,
+                        sd = beta.sd)
+  } else {
+    fit <- Cyclops::fitCyclopsModel(barData,
+                                    prior = createBarPrior(penalty = lambda,
+                                                           exclude = exclude,
+                                                           initialRidgeVariance = ridge.prior,
+                                                           tolerance = tol,
+                                                           maxIterations = max.iter,
+                                                           threshold = eps,
+                                                           delta = d))
+    if (scale == F) {
+      beta.hat <- coef(fit)
+    } else {
+      beta.hat <- coef(fit) / sd
+    }
+
+    # ----- Results
+    fit$beta   <- beta.hat
+    fit$loglik <- fit$log_likelihood
+    fit$lambda <- lambda
+    fit$iter   <- fit$barIterations
+    fit$conv   <- fit$barConverged
+    fit$ridge  <- NULL
+
+    full.fit <- fit
   }
-  
-  ridgeFit <- fitCyclopsModel(barData, prior = ridge.prior) #fit initial ridge regression 
-  beta0    <- coef(ridgeFit) #store beta0
-  
-  #----- Run iterative BAR method
-  full.fit <- bar_fit(barData, beta0, lambda = lambda, d = d, exclude = exclude, 
-                      max.iter = max.iter, tol = tol, eps = eps, scale = scale, 
-                      sd = beta.sd)
-  
-  
+
   # ----- RESULTS TO BE STORED
-  bar_results       <- full.fit 
+  bar_results       <- full.fit
   bar_results$xi    <- xi
-  #bar_results$delta <- 1 - mean(delta) 
+  #bar_results$delta <- 1 - mean(delta)
   return(bar_results)
 }
 
@@ -58,5 +83,5 @@ coxbar <- function(t, delta, X, sparseX = FALSE, COO = NULL, cyclopsForm = NULL,
 # iter: Number of iterations until convergence
 # conv: Logical. If convergence was achieved
 # ridge: Initial Ridge Estimates
-# xi: Value of xi (ridge) tuning parameter 
+# xi: Value of xi (ridge) tuning parameter
 
