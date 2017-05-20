@@ -6,7 +6,7 @@
 \usage{
 createBarPrior(penalty = "bic", exclude = c(), forceIntercept = FALSE,
   fitBestSubset = FALSE, initialRidgeVariance = 10000, tolerance = 1e-08,
-  maxIterations = 10000, threshold = 1e-06)
+  maxIterations = 10000, threshold = 1e-06, delta = 0)
 }
 \arguments{
 \item{penalty}{Specifies the BAR penalty; possible values are `BIC` or `AIC` or a numeric value}
@@ -24,6 +24,8 @@ createBarPrior(penalty = "bic", exclude = c(), forceIntercept = FALSE,
 \item{maxIterations}{Numeric: maxium iterations to achieve convergence}
 
 \item{threshold}{Numeric: absolute threshold at which to force coefficient to 0}
+
+\item{delta}{Numeric: change from 2 in ridge norm dimension}
 }
 \value{
 A BAR Cyclops prior object of class inheriting from

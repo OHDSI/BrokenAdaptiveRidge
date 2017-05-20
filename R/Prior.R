@@ -31,7 +31,8 @@
 #' @param initialRidgeVariance Numeric: variance used for algorithm initiation
 #' @param tolerance Numeric: maximum abs change in coefficient estimates from successive iterations to achieve convergence
 #' @param maxIterations Numeric: maxium iterations to achieve convergence
-#' @param threshold  Numeric: absolute threshold at which to force coefficient to 0
+#' @param threshold     Numeric: absolute threshold at which to force coefficient to 0
+#' @param delta         Numeric: change from 2 in ridge norm dimension
 #'
 #' @examples
 #' prior <- createBarPrior(penalty = "bic")
@@ -50,13 +51,15 @@ createBarPrior <- function(penalty = "bic",
                            initialRidgeVariance = 1E4,
                            tolerance = 1E-8,
                            maxIterations = 1E4,
-                           threshold = 1E-6) {
+                           threshold = 1E-6,
+                           delta = 0) {
 
     # TODO Check that penalty (and other arguments) is valid
 
     fitHook <- function(...) {
       # closure to capture BAR parameters
-      barHook(fitBestSubset, initialRidgeVariance, tolerance, maxIterations, threshold, ...)
+      barHook(fitBestSubset, initialRidgeVariance, tolerance,
+              maxIterations, threshold, delta, ...)
     }
 
     structure(list(penalty = penalty,
@@ -73,6 +76,7 @@ barHook <- function(fitBestSubset,
                     tolerance,
                     maxIterations,
                     cutoff,
+                    delta,
                     cyclopsData,
                     barPrior,
                     control,
@@ -104,7 +108,7 @@ barHook <- function(fitBestSubset,
 
     working_coef <- ifelse(abs(pre_coef) <= cutoff, 0.0, pre_coef)
     fixed <- working_coef == 0.0
-    variance <- (working_coef) ^ 2 / penalty
+    variance <- abs(working_coef) ^ (2 - delta) / penalty
 
     if (!is.null(priorType$exclude)) {
       working_coef[priorType$exclude] <- pre_coef[priorType$exclude]
