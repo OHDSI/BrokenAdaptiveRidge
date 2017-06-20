@@ -1,84 +1,10 @@
-languague: c
+language: r
 sudo: false
+cache: packages
+r_packages: 
+  - covr
+  - drat
 
-matrix:
-  include:
-    # gcc default
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-          - r-packages-precise
-          packages:
-          - r-base-dev
-          - r-recommended
-          - texinfo
-          - qpdf
-    # gcc 6
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-          - r-packages-precise
-          - ubuntu-toolchain-r-test
-          packages:
-          - r-base-dev
-          - r-recommended
-          - texinfo
-          - qpdf
-          - g++-6
-      before_script:
-        - export PKG_NAME=$(Rscript -e 'cat(paste0(devtools::as.package(".")$package))')
-        - export PKG_TARBALL=$(Rscript -e 'pkg <- devtools::as.package("."); cat(paste0(pkg$package,"_",pkg$version,".tar.gz"))')      
-        - echo 'CC=gcc-6' > ~/.R/Makevars
-        - echo 'CXX=g++-6' >> ~/.R/Makevars
-        - echo 'CXX1X=g++-6' >> ~/.R/Makevars
-        - echo 'PKG_CXXFLAGS= -std=c++14 -s -g1 -Wno-ignored-attributes -Wno-deprecated-declarations' >> ~/.R/Makevars
-
-#addons:
-#  apt:
-#    sources:
-#    - r-packages-precise
-#    packages:
-#    - r-base-dev
-#    - r-recommended
-#    - texinfo
-#    - qpdf
-    
-cache:
-  directories:
-    - ~/Rlib     # R libraries
-    - ~/texlive  # LaTex 
-    - ~/bin      # pandoc 
-
-# install dependencies
-install:
-  # Save R packages in Rlib
-  - mkdir -p ~/Rlib
-  - echo 'R_LIBS=~/Rlib' > .Renviron
-  - echo 'options(repos = "http://cran.rstudio.com")' > .Rprofile
-  - mkdir -p ~/.R
-  # Build LaTex and pandoc
-  - mkdir -p ~/bin
-  - wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-texlive | bash
-  - wget -q -O - https://github.com/yihui/crandalf/raw/master/inst/scripts/install-pandoc | bash
-  - PATH=$HOME/texlive/bin/x86_64-linux:$PATH  
-  # Install R packages
-  - Rscript -e "if (!require('devtools')) install.packages('devtools')"    
-  - Rscript -e "if (!require('covr')) devtools::install_github('jimhester/covr')"  
-  - Rscript -e "if (!require('rmarkdown')) install.packages('rmarkdown')"
-  - Rscript -e "if (!require('knitr')) install.packages('knitr')"  
-  - Rscript -e "if (!require('drat')) install.packages('drat')"      
-  - Rscript -e "if (!require('ff')) install.packages('ff')"
-  - Rscript -e "if (!require('ffbase')) install.packages('ffbase')"
-  - Rscript -e "if (!require('ggplot2')) install.packages('ggplot2')"
-  - Rscript -e "if (!require('RcppParallel')) install.packages('RcppParallel')"
-  - Rscript -e "if (!require('BH')) install.packages('BH')"
-  - Rscript -e "if (!require('RcppEigen')) install.packages('RcppEigen')"
-  - Rscript -e "if (!require('testthat')) install.packages('testthat')"
-  - Rscript -e "if (!require('gnm')) install.packages('gnm')"
-  - Rscript -e "if (!require('Cyclops')) devtools::install_github('OHDSI/Cyclops')"
-  
 before_script:
   - export PKG_NAME=$(Rscript -e 'cat(paste0(devtools::as.package(".")$package))')
   - export PKG_TARBALL=$(Rscript -e 'pkg <- devtools::as.package("."); cat(paste0(pkg$package,"_",pkg$version,".tar.gz"))')
@@ -96,7 +22,3 @@ after_success:
   # Rebuild drat repo   
   - export PKG_TARBALL=$(Rscript -e 'pkg <- devtools::as.package("."); cat(paste0(pkg$package,"_",pkg$version,".tar.gz"))')    
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && bash deploy.sh
-  
-env:
-  global:
-    secure: xXchVusSH2DCSKg8JRtsvW7cBzomCGkry7e7QtC9F81wbxCi0tPRFWG+32zzLa0JCN4XPZkaGLibg6roNh6Iu5paOJzbRA+hlEDfdpy3JvnxUHy/WzNbW2PY1V7v0IhH0tcWsRIABDVtg+6w/6MM2Up+J/rslc9t0FyJ6B4e/9J+EK8nMuCV1e9hSFoTQOl7fVkwnb0vCGjrs+webPeTW9/u2wRi/xn8eGe4cTy6CM8hRks9lveMTjpl32WjvNl63Fj+K5NLJxtm+s8mGazYq8IJF8D1kT1Qj5NMpPwpJeGqDz678N+SsUH/UA9cUN1TkxDLyo4B5GFmbkp4wHfvIW+PxRnN0gY1H1xYHybeD7fXNokv0O3pOb/8Z+Zb+rZvxMWGfVAl9+7txelz6+vehfDp0wVq3tHOGUVsS90dL7Y2X/+gMuVfJz74EtMO8fr1drongZ373N3aMzveJ7VcyMweIj1WMX8mMmh6JVNCn5WjM/iHJc9prGt6fcDwT3l3JDm3wxuVPAfKE3tu3TxRUDiaKswVMzbVWo+0muRqVQAVEAgNqZhS6cXh6F2Dc01Zj+TRPJTnW/CEaE37SOXfyy7nJbuehRval1jWIAOPQV8JDMScxfIYHli5pYLDhn7/DciCdp/3wQXj0sOGz5QeUg6eyCogmeyhcvNMhKMVzEY=
