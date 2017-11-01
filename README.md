@@ -15,6 +15,30 @@ Features
 
 Examples
 ========
+ * Cox's Proportional Hazards Model
+ ```r
+ library(Cyclops)
+ library(BrokenAdaptiveRidge)
+ library(survival)
+ 
+pbc.cc        <- pbc[complete.cases(pbc), ] #Extract only complete cases
+pbc.cc$sex    <- ifelse(pbc.cc$sex == "f", 1, 0) #Change sex to a numeric
+pbc.cc$trt    <- ifelse(pbc.cc$trt == 2, 1, 0) #Change trt from (1, 2) to (0, 1)
+pbc.cc$status <- ifelse(status == 2, 1, 0) #Change censoring definition to transplant/dead (1) vs. censored (0)
+time          <- pbc.cc$time 
+status        <- pbc.cc$status
+X             <- pbc.cc[, 4:20]
+X             <- scale(as.matrix(X)) #Standardize the covariate matrix, X.
+
+#- Tuning Parameters:
+xi     <- 1 #Initial ridge penalty
+lambda <- log(dim(X)[1]) #BAR penalty (corresponds to BIC-type penalty)
+
+dataFit  <- createCyclopsData(Surv(time, status) ~ X, modelType = "cox")
+barPrior <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
+fit      <- fitCyclopsModel(dataFit, prior = barPrior)
+coef(fit) #Extract coefficients
+ ```
  
 Technology
 ============
@@ -43,8 +67,10 @@ Getting Started
 
   ```r
   library(BrokenAdaptiveRidge)
-  cyclopsData <- createCyclopsDataFrame(formula) ## TODO: Update
-  cyclopsFit <- fitCyclopsModel(cyclopsData)
+  cyclopsData <- createCyclopsData(formula, modelType = "modelType") ## TODO: Update
+  barPrior    <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
+  cyclopsFit  <- fitCyclopsModel(cyclopsData, prior = barPrior)
+  coef(cyclopsFit) #Extract coefficients
   ```
  
 Getting Involved
