@@ -30,9 +30,12 @@ status        <- pbc.cc$status
 X             <- pbc.cc[, 4:20]
 X             <- scale(as.matrix(X)) #Standardize the covariate matrix, X.
 
-#Run CoxBAR w/ lambda = log(n) and xi = 1
+#- Tuning Parameters:
+xi     <- 1 #Initial ridge penalty
+lambda <- log(dim(X)[1]) #BAR penalty (corresponds to BIC-type penalty)
+
 dataFit  <- createCyclopsData(Surv(time, status) ~ X, modelType = "cox")
-barPrior <- createBarPrior(penalty = log(dim(X)[1]) / 2, initialRidgeVariance = 0.5) 
+barPrior <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
 fit      <- fitCyclopsModel(dataFit, prior = barPrior)
 coef(fit) #Extract coefficients
  ```
@@ -65,7 +68,7 @@ Getting Started
   ```r
   library(BrokenAdaptiveRidge)
   cyclopsData <- createCyclopsData(formula, modelType = "modelType") ## TODO: Update
-  barPrior    <- createBarPrior(penalty = lambda/2, initialRidgeVariance = 2/xi) 
+  barPrior    <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
   cyclopsFit  <- fitCyclopsModel(cyclopsData, prior = barPrior)
   coef(cyclopsFit) #Extract coefficients
   ```
