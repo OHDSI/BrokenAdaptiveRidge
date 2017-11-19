@@ -94,10 +94,12 @@ barHook <- function(fitBestSubset,
                                        control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
 
   priorType <- createBarPriorType(cyclopsData, barPrior$exclude, barPrior$forceIntercept)
-  include <- setdiff(c(1:Cyclops::getNumberOfCovariates(cyclopsData)), priorType$exclude)
+  include <- setdiff(c(1:Cyclops::getNumberOfCovariates(cyclopsData)), priorType$excludeIndices)
 
   pre_coef <- coef(startFit)
   penalty <- getPenalty(cyclopsData, barPrior)
+
+  futile.logger::flog.trace("Initial penalty: %f", penalty)
 
   continue <- TRUE
   count <- 0
@@ -110,13 +112,15 @@ barHook <- function(fitBestSubset,
     fixed <- working_coef == 0.0
     variance <- abs(working_coef) ^ (2 - delta) / penalty
 
-    if (!is.null(priorType$exclude)) {
-      working_coef[priorType$exclude] <- pre_coef[priorType$exclude]
-      fixed[priorType$exclude] <- FALSE
-      variance[priorType$exclude] <- 0
+    if (!is.null(priorType$excludeIndices)) {
+      working_coef[priorType$excludeIndices] <- pre_coef[priorType$excludeIndices]
+      fixed[priorType$excludeIndices] <- FALSE
+      variance[priorType$excludeIndices] <- 0
     }
 
-    prior <- Cyclops::createPrior(priorType$types, variance = variance)
+    prior <- Cyclops::createPrior(priorType$types, variance = variance,
+                                  forceIntercept = barPrior$forceIntercept)
+
     fit <- Cyclops::fitCyclopsModel(cyclopsData,
                                     prior = prior,
                                     control, weights, forceNewObject,
@@ -124,6 +128,12 @@ barHook <- function(fitBestSubset,
                                     fixedCoefficients = fixed)
 
     coef <- coef(fit)
+
+    end <- min(10, length(variance))
+    futile.logger::flog.trace("Itr: %d", count)
+    futile.logger::flog.trace("\tVar : ", variance[1:end], capture = TRUE)
+    futile.logger::flog.trace("\tCoef: ", coef[1:end], capture = TRUE)
+    futile.logger::flog.trace("")
 
     if (max(abs(coef - pre_coef)) < tolerance) {
       converged <- TRUE
@@ -186,13 +196,20 @@ createBarPriorType <- function(cyclopsData,
     }
   }
 
+  indices <- NULL
+  if (!is.null(exclude)) {
+    covariateIds <- Cyclops::getCovariateIds(cyclopsData)
+    indices <- which(covariateIds %in% exclude)
+  }
+
   types <- rep("normal", Cyclops::getNumberOfCovariates(cyclopsData))
   if (!is.null(exclude)) {
-    types[exclude] <- "none"
+    types[indices] <- "none"
   }
 
   list(types = types,
-       exclude = exclude)
+       excludeCovariateIds = exclude,
+       excludeIndices = indices)
 }
 
 getPenalty <- function(cyclopsData, barPrior) {
