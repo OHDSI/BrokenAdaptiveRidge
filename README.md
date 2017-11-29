@@ -17,29 +17,68 @@ Examples
 ========
  * Cox's Proportional Hazards Model
  ```r
- library(Cyclops)
- library(BrokenAdaptiveRidge)
- library(survival)
+library(Cyclops)
+library(BrokenAdaptiveRidge)
+library(survival)
+
+## data dimension
+p <- 20    # number of covariates
+n <- 300   # sample size
+
+## tuning parameters
+lambda <- log(n)  # BAR penalty (BIC)
+xi     <- 0.1     # initial ridge penalty
+
+## Cox model parameters 
+true.beta <- c(1, 0, 0, -1, 1, rep(0, p - 5))
+
+## simulate data from an exponential model
+x        <- matrix(rnorm(p * n, mean = 0, sd = 1), ncol = p)
+ti       <- rweibull(n, shape = 1, scale = exp(-x%*%true.beta))
+ui       <- runif(n, 0, 10) # Controls censoring
+ci       <- rweibull(n, shape = 1, scale = ui * exp(-x%*%true.beta))
+survtime <- pmin(ti, ci)
+delta    <- ti == survtime; mean(delta) 
  
-pbc.cc        <- pbc[complete.cases(pbc), ] #Extract only complete cases
-pbc.cc$sex    <- ifelse(pbc.cc$sex == "f", 1, 0) #Change sex to a numeric
-pbc.cc$trt    <- ifelse(pbc.cc$trt == 2, 1, 0) #Change trt from (1, 2) to (0, 1)
-pbc.cc$status <- ifelse(status == 2, 1, 0) #Change censoring definition to transplant/dead (1) vs. censored (0)
-time          <- pbc.cc$time 
-status        <- pbc.cc$status
-X             <- pbc.cc[, 4:20]
-X             <- scale(as.matrix(X)) #Standardize the covariate matrix, X.
+cyclopsData <- createCyclopsData(Surv(survtime, delta) ~ x, modelType = "cox")
+barPrior    <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
 
-#- Tuning Parameters:
-xi     <- 1 #Initial ridge penalty
-lambda <- log(dim(X)[1]) #BAR penalty (corresponds to BIC-type penalty)
-
-dataFit  <- createCyclopsData(Surv(time, status) ~ X, modelType = "cox")
-barPrior <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
-fit      <- fitCyclopsModel(dataFit, prior = barPrior)
-coef(fit) #Extract coefficients
+cyclopsFit <- fitCyclopsModel(cyclopsData,
+                              prior = barPrior)
+coef(cyclopsFit) 
  ```
- 
+
+* Generalized Linear Model
+ ```r
+library(Cyclops)
+library(BrokenAdaptiveRidge)
+
+## data dimension
+p <- 20    # number of covariates
+n <- 300   # sample size
+
+## tuning parameters
+lambda <- log(n)  # BAR penalty (BIC)
+xi     <- 0.1     # initial ridge penalty
+
+## logistic model parameters 
+itcpt     <- 0.2 # intercept
+true.beta <- c(1, 0, 0, -1, 1, rep(0, p - 5))
+
+## simulate data from logistic model
+x <- matrix(rnorm(p * n, mean = 0, sd = 1), ncol = p)
+y <- rbinom(n, 1, 1 / (1 + exp(-itcpt - x%*%true.beta)))
+
+
+# fit BAR model
+cyclopsData <- createCyclopsData(y ~ x, modelType = "lr")
+barPrior    <- createBarPrior(penalty = lambda / 2, exclude = c("(Intercept)"), 
+                              initialRidgeVariance = 2 / xi) 
+
+cyclopsFit <- fitCyclopsModel(cyclopsData,
+                              prior = barPrior)
+coef(cyclopsFit) 
+ ```
 Technology
 ============
 
