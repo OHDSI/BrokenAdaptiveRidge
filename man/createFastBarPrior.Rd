@@ -34,6 +34,7 @@ A BAR Cyclops prior object of class inheriting from
 \code{createFastBarPrior} creates a fastBAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
 }
 \examples{
-prior <- createFastBarPrior(penalty = log(p), initialRidgeVariance = 1 / log(p))
+nobs = 500; ncovs = 100
+prior <- createFastBarPrior(penalty = log(ncovs), initialRidgeVariance = 1 / log(ncovs))
 
 }

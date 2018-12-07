@@ -35,7 +35,8 @@
 #' @param threshold     Numeric: absolute threshold at which to force coefficient to 0
 #'
 #' @examples
-#' prior <- createFastBarPrior(penalty = log(p), initialRidgeVariance = 1 / log(p))
+#' nobs = 500; ncovs = 100
+#' prior <- createFastBarPrior(penalty = log(ncovs), initialRidgeVariance = 1 / log(ncovs))
 #'
 #' @return
 #' A BAR Cyclops prior object of class inheriting from
@@ -152,7 +153,7 @@ fastBarHook <- function(fitBestSubset,
 
   if (fitBestSubset) {
     fit <- Cyclops::fitCyclopsModel(cyclopsData, prior = createPrior("none"),
-                                    control, weights, forceNewObject, fixedCoefficients = fixed)
+                                    control, weights, forceNewObject, fixedCoefficients = (working_coef == 0))
   }
 
   class(fit) <- c(class(fit), "cyclopsFastBarFit")
