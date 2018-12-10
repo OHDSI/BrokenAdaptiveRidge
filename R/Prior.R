@@ -24,7 +24,7 @@
 #' @description
 #' \code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
 #'
-#' @param penalty        Specifies the BAR penalty; possible values are `BIC` or `AIC` or a numeric value
+#' @param penalty        Specifies the BAR penalty; possible values are `BIC`, `cBIC` or `AIC` or a numeric value
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior
 #' @param forceIntercept Logical: Force intercept coefficient into regularization
 #' @param fitBestSubset  Logical: Fit final subset with no regularization
@@ -203,6 +203,10 @@ getPenalty <- function(cyclopsData, barPrior) {
 
   if (barPrior$penalty == "bic") {
     return(log(Cyclops::getNumberOfRows(cyclopsData)) / 2) # TODO Handle stratified models
+  } else if (barPrior$penalty == "cbic")
+    # TODO Check for survival-type model
+    # TODO Get number of non-censured events
+    stop("Not yet implemented")
   } else {
     stop("Unhandled BAR penalty type")
   }
