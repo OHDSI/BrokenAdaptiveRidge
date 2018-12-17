@@ -35,4 +35,6 @@ test_that("fastBAR prior is the same as old BAR implementation", {
 
 
   expect_equal(coef(cyclopsFit), coef(cyclopsFit2))
+  expect_equal(class(cyclopsFit2)[1], "cyclopsFit")
+  expect_equal(class(cyclopsFit2)[2], "cyclopsFastBarFit")
 })

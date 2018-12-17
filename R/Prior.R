@@ -92,7 +92,6 @@ barHook <- function(fitBestSubset,
                                                                                    forceIntercept = barPrior$forceIntercept,
                                                                                    initialRidgeVariance = initialRidgeVariance),
                                        control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
-
   priorType <- createBarPriorType(cyclopsData, barPrior$exclude, barPrior$forceIntercept)
   include <- setdiff(c(1:Cyclops::getNumberOfCovariates(cyclopsData)), priorType$excludeIndices)
 
@@ -104,7 +103,6 @@ barHook <- function(fitBestSubset,
   continue <- TRUE
   count <- 0
   converged <- FALSE
-
   while (continue) {
     count <- count + 1
 
@@ -126,7 +124,6 @@ barHook <- function(fitBestSubset,
                                     control, weights, forceNewObject,
                                     startingCoefficients = working_coef,
                                     fixedCoefficients = fixed)
-
     coef <- coef(fit)
 
     end <- min(10, length(variance))
