@@ -32,7 +32,6 @@
 #' @param initialRidgeVariance Numeric: variance used for algorithm initiation
 #' @param tolerance Numeric: maximum abs change in coefficient estimates from successive iterations to achieve convergence
 #' @param maxIterations Numeric: maxium iterations to achieve convergence
-#' @param threshold     Numeric: absolute threshold at which to force coefficient to 0
 #'
 #' @examples
 #' nobs = 500; ncovs = 100
@@ -59,7 +58,7 @@ createFastBarPrior <- function(penalty = 0,
   fitHook <- function(...) {
     # closure to capture BAR parameters
     fastBarHook(fitBestSubset, initialRidgeVariance, tolerance,
-            maxIterations, threshold,...)
+            maxIterations, threshold, ...)
   }
 
   structure(list(penalty = penalty,
