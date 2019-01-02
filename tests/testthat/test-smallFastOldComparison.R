@@ -1,7 +1,7 @@
 library("testthat")
 library("survival")
 
-test_that("fastBAR prior is the same as old BAR implementation", {
+test_that("fastBAR prior is the same as old BAR implementation for cox model", {
 
   skip_on_cran()
   skip_on_travis()

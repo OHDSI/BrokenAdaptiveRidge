@@ -1,9 +1,5 @@
 library("testthat")
 
-#
-# BAR regression
-#
-
 test_that("Numeric penalty", {
   prior <- createFastBarPrior(penalty = 10)
   expect_equal(BrokenAdaptiveRidge:::getPenalty(NULL, prior), 10)
