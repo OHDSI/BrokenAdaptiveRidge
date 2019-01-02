@@ -102,13 +102,13 @@ fastBarHook <- function(fitBestSubset,
   continue <- TRUE
   count <- 0
   converged <- FALSE
+  variance <- rep(1 / penalty, getNumberOfCovariates(cyclopsData)) #Create penalty for each covariate.
 
   while (continue) {
     count <- count + 1
 
     #Note: Don't fix zeros as zero for next iteration.
     #fixed <- working_coef == 0.0
-    variance <- 1 / penalty
     if (!is.null(priorType$excludeIndices)) {
       working_coef[priorType$excludeIndices]
       #fixed[priorType$excludeIndices] <- FALSE
@@ -193,10 +193,11 @@ createFastBarPriorType <- function(cyclopsData,
     indices <- which(covariateIds %in% exclude)
   }
 
-  types <- "barupdate"
-  #if (!is.null(exclude)) {
-  #  types[indices] <- "none"
-  #}
+  # "Unpenalize" excluded covariates
+  types <- rep("barupdate", Cyclops::getNumberOfCovariates(cyclopsData))
+  if (!is.null(exclude)) {
+    types[indices] <- "none"
+  }
 
   list(types = types,
        excludeCovariateIds = exclude,
