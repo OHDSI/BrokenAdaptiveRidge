@@ -1,26 +1,32 @@
 Package: BrokenAdaptiveRidge
 Type: Package
 Title: Broken adaptive ridge extensions to Cyclop
-Version: 0.2.0
-Date: 2017-11-19
-Author: Marc A. Suchard [aut, cre],
-    Eric Kawaguchi [aut],
-    Ning Li [aut],
-    Gang Li [aut]
+Version: 1.0.0
+Date: 2023-04-05
+Authors@R: c(
+    person("Marc A.", "Suchard", email = "msuchard@ucla.edu", role = c("aut","cre")),
+    person("Eric", "Kawaguchi", role = "aut"),
+    person("Ning", "Li", role = "aut"),
+    person("Gang", "Li", role = "aut"),
+    person("Observational Health Data Sciences and Informatics", role = "cph")
+    )
 Maintainer: Marc A. Suchard <msuchard@ucla.edu>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Approximates best-subset selection (L0) regression with
+   an iteratively adaptive Ridge (L2) penalty.  This package uses Cyclops
+   for an efficient implementation.
 License: Apache License 2.0
 VignetteBuilder: knitr
 Depends:
     R (>= 3.2.2),
-    Cyclops (>= 1.3.0)
+    Cyclops (>= 3.0.0)
 Imports:
-    futile.logger
+    futile.logger,
+    bit64
 Suggests:
     testthat,
+    survival,
     knitr,
     rmarkdown
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 7.1.1

@@ -4,10 +4,16 @@
 \alias{createFastBarPrior}
 \title{Create a fastBAR Cyclops prior object}
 \usage{
-createFastBarPrior(penalty = 0, exclude = c(),
-  forceIntercept = FALSE, fitBestSubset = FALSE,
-  initialRidgeVariance = 10000, tolerance = 1e-08,
-  maxIterations = 10000, threshold = 1e-06)
+createFastBarPrior(
+  penalty = 0,
+  exclude = c(),
+  forceIntercept = FALSE,
+  fitBestSubset = FALSE,
+  initialRidgeVariance = 10000,
+  tolerance = 1e-08,
+  maxIterations = 10000,
+  threshold = 1e-06
+)
 }
 \arguments{
 \item{penalty}{Specifies the BAR penalty}
@@ -22,7 +28,7 @@ createFastBarPrior(penalty = 0, exclude = c(),
 
 \item{tolerance}{Numeric: maximum abs change in coefficient estimates from successive iterations to achieve convergence}
 
-\item{maxIterations}{Numeric: maxium iterations to achieve convergence}
+\item{maxIterations}{Numeric: maximum iterations to achieve convergence}
 
 \item{threshold}{Numeric: absolute threshold at which to force coefficient to 0}
 }

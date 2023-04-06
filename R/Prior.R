@@ -177,7 +177,7 @@ createBarPriorType <- function(cyclopsData,
   exclude <- Cyclops:::.checkCovariates(cyclopsData, exclude)
 
   if (Cyclops:::.cyclopsGetHasIntercept(cyclopsData) && !forceIntercept) {
-    interceptId <- Cyclops:::.cyclopsGetInterceptLabel(cyclopsData)
+    interceptId <- bit64::as.integer64(Cyclops:::.cyclopsGetInterceptLabel(cyclopsData))
     warn <- FALSE
     if (is.null(exclude)) {
       exclude <- c(interceptId)

@@ -31,7 +31,8 @@
 #' @param fitBestSubset  Logical: Fit final subset with no regularization
 #' @param initialRidgeVariance Numeric: variance used for algorithm initiation
 #' @param tolerance Numeric: maximum abs change in coefficient estimates from successive iterations to achieve convergence
-#' @param maxIterations Numeric: maxium iterations to achieve convergence
+#' @param maxIterations Numeric: maximum iterations to achieve convergence
+#' @param threshold Numeric: absolute threshold at which to force coefficient to 0
 #'
 #' @examples
 #' nobs = 500; ncovs = 100
@@ -171,7 +172,7 @@ createFastBarPriorType <- function(cyclopsData,
   exclude <- Cyclops:::.checkCovariates(cyclopsData, exclude)
 
   if (Cyclops:::.cyclopsGetHasIntercept(cyclopsData) && !forceIntercept) {
-    interceptId <- Cyclops:::.cyclopsGetInterceptLabel(cyclopsData)
+    interceptId <- bit64::as.integer64(Cyclops:::.cyclopsGetInterceptLabel(cyclopsData))
     warn <- FALSE
     if (is.null(exclude)) {
       exclude <- c(interceptId)
