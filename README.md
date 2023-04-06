@@ -1,13 +1,13 @@
 BrokenAdaptiveRidge
 =======
 
-[![Build Status](https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/IterativeHardThresholding/actions?query=workflow%3AR-CMD-check)
+[![Build Status](https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/BrokenAdaptiveRidge/actions?query=workflow%3AR-CMD-check)
 [![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main)](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main)
 
 Introduction
 ============
 
-BrokenAdaptiveRidge is an `R` package for performing L_0-based regressions using `Cyclops`
+`BrokenAdaptiveRidge` is an `R` package for performing L_0-based regressions using `Cyclops`
 
 Features
 ========
@@ -83,7 +83,7 @@ Dependencies
 Getting Started
 ===============
 1. On Windows, make sure [RTools](https://CRAN.R-project.org/bin/windows/Rtools/) is installed.
-2. In R, use the following commands to download and install BrokenAdaptiveRidge:
+2. In R, use the following commands to download and install `BrokenAdaptiveRidge`:
 
   ```r
   install.packages("devtools")
