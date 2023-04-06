@@ -1,6 +1,6 @@
 # @file fastBarPrior.R
 #
-# Copyright 2017 Observational Health Data Sciences and Informatics
+# Copyright 2023 Observational Health Data Sciences and Informatics
 #
 # This file is part of BrokenAdaptiveRidge
 #
