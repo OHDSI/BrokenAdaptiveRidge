@@ -2,7 +2,7 @@ BrokenAdaptiveRidge
 =======
 
 [![Build Status](https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/BrokenAdaptiveRidge/actions?query=workflow%3AR-CMD-check)
-[![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main)](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main)
+[![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main)](https://app.codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main)
 
 Introduction
 ============
