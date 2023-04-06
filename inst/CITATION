@@ -1,6 +1,19 @@
 citHeader("To cite BrokenAdaptiveRidge in publications use:")
 
 bibentry(bibtype = "Article",
+        author = c( as.person("E. Kawaguchi"),
+                   as.person("M. A. Suchard"),
+                   as.person("Z. Liu"),
+                   as.person("G. Li")),
+        title = "A surrogate L0 sparse Cox regression with applications to sparse high-dimensional massive sample size time-to-event data",
+        journal = "Statistics in Medicine",
+        volume = "39",
+        pages = "675-686",
+        year = "2020",
+        url = "https://doi.org/10.1002/sim.8438"
+)
+
+bibentry(bibtype = "Article",
         author = c(as.person("N. Li"),
                    as.person("X. Peng"),
                    as.person("E. Kawaguchi"),

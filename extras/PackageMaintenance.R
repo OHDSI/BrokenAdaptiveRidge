@@ -22,8 +22,8 @@ OhdsiRTools::checkUsagePackage("BrokenAdaptiveRidge")
 OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes:
-shell("rm extras/BrokenAdaptiveRidge.pdf")
-shell("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
+system("rm extras/BrokenAdaptiveRidge.pdf")
+system("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
 
 # rmarkdown::render("vignettes/SingleStudies.Rmd",
 #                   output_file = "../inst/doc/SingleStudies.pdf",
