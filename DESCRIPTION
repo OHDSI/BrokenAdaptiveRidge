@@ -1,6 +1,6 @@
 Package: BrokenAdaptiveRidge
 Type: Package
-Title: Broken adaptive ridge extensions to Cyclop
+Title: Broken Adaptive Ridge Regression with Cyclop
 Version: 0.9.0
 Date: 2023-04-05
 Authors@R: c(
@@ -15,7 +15,6 @@ Description: Approximates best-subset selection (L0) regression with
    an iteratively adaptive Ridge (L2) penalty.  This package uses Cyclops
    for an efficient implementation.
 License: Apache License 2.0
-VignetteBuilder: knitr
 Depends:
     R (>= 3.2.2),
     Cyclops (>= 3.0.0)
