@@ -6,3 +6,4 @@ compare_versions
 extras
 cran-comments.md
 ^.Rd2
+^CRAN-SUBMISSION$
