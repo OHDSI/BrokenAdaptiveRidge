@@ -25,6 +25,18 @@ OhdsiRTools::updateCopyrightYearFolder()
 system("rm extras/BrokenAdaptiveRidge.pdf")
 system("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
 
+Create manual and website
+if (.Platform$OS.type == "unix") {
+  system("rm extras/BrokenAdaptiveRidge.pdf")
+  system("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
+} else {
+  unlink("extras/BrokenAdaptiveRidge.pdf")
+  shell("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
+}
+
+pkgdown::build_site()
+OhdsiRTools::fixHadesLogo()
+
 # rmarkdown::render("vignettes/SingleStudies.Rmd",
 #                   output_file = "../inst/doc/SingleStudies.pdf",
 #                   rmarkdown::pdf_document(latex_engine = "pdflatex",
