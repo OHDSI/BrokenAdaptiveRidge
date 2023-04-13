@@ -47,10 +47,13 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://ohdsi.github.io/Hades" class="external-link">hadesLogo</a>
+  <a href="https://ohdsi.github.io/Hades" class="external-link"><img src='https://ohdsi.github.io/Hades/images/hadesMini.png' width=80 height=17 style='vertical-align: top;'></a>
 </li>
       </ul>
 </div>
@@ -68,19 +71,20 @@
 <div class="section level1">
 <div class="page-header"><h1 id="brokenadaptiveridge">BrokenAdaptiveRidge<a class="anchor" aria-label="anchor" href="#brokenadaptiveridge"></a>
 </h1></div>
-<p><a href="https://github.com/OHDSI/BrokenAdaptiveRidge/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg" alt="Build Status"></a> <a href="https://app.codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main" class="external-link"><img src="https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main" alt="codecov.io"></a></p>
+<p><a href="https://github.com/OHDSI/BrokenAdaptiveRidge/actions?query=workflow%3AR-CMD-check" class="external-link"><img src="https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg" alt="Build Status"></a> <a href="https://app.codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main" class="external-link"><img src="https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main" alt="codecov.io"></a> <a href="https://cran.r-project.org/package=BrokenAdaptiveRidge" class="external-link"><img src="http://www.r-pkg.org/badges/version/BrokenAdaptiveRidge" alt="CRAN_Status_Badge"></a> <a href="https://cran.r-project.org/package=BrokenAdaptiveRidge" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/BrokenAdaptiveRidge" alt="CRAN_Status_Badge"></a></p>
+<p>BrokenAdaptiveRidge is part of <a href="https://ohdsi.github.io/Hades/" class="external-link">HADES</a>.</p>
 </div>
 <div class="section level1">
 <h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h1>
 <p><code>BrokenAdaptiveRidge</code> is an <code>R</code> package for performing L_0-based regressions using <code>Cyclops</code></p>
 </div>
-<div class="section level1"><h1 id="features">Features<a class="anchor" aria-label="anchor" href="#features"></a>
-</h1></div>
 <div class="section level1">
 <h1 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h1>
-<ul><li>Generalized Linear Model</li></ul>
+<ul>
+<li>Generalized Linear Model</li>
+</ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ohdsi/cyclops" class="external-link">Cyclops</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BrokenAdaptiveRidge</span><span class="op">)</span></span>
@@ -135,8 +139,11 @@
 <span><span class="va">fit2</span></span>
 <span><span class="va">fit3</span></span></code></pre></div>
 </div>
-<div class="section level1"><h1 id="technology">Technology<a class="anchor" aria-label="anchor" href="#technology"></a>
-</h1></div>
+<div class="section level1">
+<h1 id="technology">Technology<a class="anchor" aria-label="anchor" href="#technology"></a>
+</h1>
+<p>BrokenAdaptiveRidge is an R package.</p>
+</div>
 <div class="section level1">
 <h1 id="system-requirements">System Requirements<a class="anchor" aria-label="anchor" href="#system-requirements"></a>
 </h1>
@@ -145,34 +152,31 @@
 <div class="section level1">
 <h1 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
 </h1>
-<ul><li><code>Cyclops</code></li></ul>
+<ul>
+<li><code>Cyclops</code></li>
+</ul>
 </div>
 <div class="section level1">
-<h1 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
+<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h1>
-<ol style="list-style-type: decimal">
-<li>On Windows, make sure <a href="https://CRAN.R-project.org/bin/windows/Rtools/" class="external-link">RTools</a> is installed.</li>
-<li>In R, use the following commands to download and install <code>BrokenAdaptiveRidge</code>:</li>
-</ol>
+<p>To install the latest stable version, install from CRAN:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ohdsi/Cyclops"</span><span class="op">)</span> </span>
-<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"ohdsi/BrokenAdaptiveRidge"</span><span class="op">)</span> </span></code></pre></div>
-<ol start="3" style="list-style-type: decimal"><li>To perform a L_0-based Cyclops model fit, use the following commands in R:</li></ol>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BrokenAdaptiveRidge</span><span class="op">)</span></span>
-<span><span class="va">cyclopsData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/createCyclopsData.html" class="external-link">createCyclopsData</a></span><span class="op">(</span><span class="va">formula</span>, modelType <span class="op">=</span> <span class="st">"modelType"</span><span class="op">)</span> <span class="co">## TODO: Update</span></span>
-<span><span class="va">barPrior</span>    <span class="op">&lt;-</span> <span class="fu"><a href="reference/createBarPrior.html">createBarPrior</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="va">lambda</span> <span class="op">/</span> <span class="fl">2</span>, initialRidgeVariance <span class="op">=</span> <span class="fl">2</span> <span class="op">/</span> <span class="va">xi</span><span class="op">)</span> </span>
-<span><span class="va">cyclopsFit</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/Cyclops/man/fitCyclopsModel.html" class="external-link">fitCyclopsModel</a></span><span class="op">(</span><span class="va">cyclopsData</span>, prior <span class="op">=</span> <span class="va">barPrior</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">cyclopsFit</span><span class="op">)</span> <span class="co">#Extract coefficients</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BrokenAdaptiveRidge"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level1">
-<h1 id="getting-involved">Getting Involved<a class="anchor" aria-label="anchor" href="#getting-involved"></a>
+<h1 id="user-documentation">User Documentation<a class="anchor" aria-label="anchor" href="#user-documentation"></a>
 </h1>
+<p>Documentation can be found on the <a href="https://ohdsi.github.io/BrokenAdaptiveRidge/" class="external-link">package website</a>.</p>
+<p>PDF versions of the documentation are also available:</p>
 <ul>
 <li>Package manual: <a href="https://raw.githubusercontent.com/OHDSI/BrokenAdaptiveRidge/master/extras/BrokenAdaptiveRidge.pdf" class="external-link">BrokenAdaptiveRidge manual</a>
 </li>
+</ul>
+</div>
+<div class="section level1">
+<h1 id="support">Support<a class="anchor" aria-label="anchor" href="#support"></a>
+</h1>
+<ul>
 <li>Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers" class="external-link">OHDSI Forum</a>
 </li>
 <li>We use the <a href="https://github.com/OHDSI/BrokenAdaptiveRidge/issues" class="external-link">GitHub issue tracker</a> for all bugs/issues/enhancements</li>
@@ -191,7 +195,9 @@
 <div class="section level1">
 <h1 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
 </h1>
-<ul><li>This project is supported in part through the National Institutes of Health grant R01 HG006139.</li></ul>
+<ul>
+<li>This project is supported in part through the National Institutes of Health grant R01 HG006139.</li>
+</ul>
 </div>
 
   </div>

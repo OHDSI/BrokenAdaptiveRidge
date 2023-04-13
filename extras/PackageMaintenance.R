@@ -22,7 +22,6 @@ OhdsiRTools::checkUsagePackage("BrokenAdaptiveRidge")
 OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes:
-Create manual and website
 if (.Platform$OS.type == "unix") {
   system("rm extras/BrokenAdaptiveRidge.pdf")
   system("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")

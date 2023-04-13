@@ -1,19 +1,22 @@
 BrokenAdaptiveRidge
-=======
+===================
 
 [![Build Status](https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/BrokenAdaptiveRidge/actions?query=workflow%3AR-CMD-check)
 [![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main)](https://app.codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/BrokenAdaptiveRidge)](https://cran.r-project.org/package=BrokenAdaptiveRidge)
+[![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/BrokenAdaptiveRidge)](https://cran.r-project.org/package=BrokenAdaptiveRidge)
+
+BrokenAdaptiveRidge is part of [HADES](https://ohdsi.github.io/Hades/).
+
 
 Introduction
 ============
 
 `BrokenAdaptiveRidge` is an `R` package for performing L_0-based regressions using `Cyclops`
 
-Features
-========
-
 Examples
 ========
+
 * Generalized Linear Model
  ```r
 library(Cyclops)
@@ -69,54 +72,57 @@ fit1
 fit2
 fit3
  ```
+
 Technology
-============
+==========
+
+BrokenAdaptiveRidge is an R package.
 
 System Requirements
 ===================
+
 Requires `R` (version 3.2.0 or higher).
 
 Dependencies
 ============
+
  * `Cyclops`
 
-Getting Started
-===============
-1. On Windows, make sure [RTools](https://CRAN.R-project.org/bin/windows/Rtools/) is installed.
-2. In R, use the following commands to download and install `BrokenAdaptiveRidge`:
+Installation
+============
 
-  ```r
-  install.packages("devtools")
-  library(devtools)
-  install.packages("ohdsi/Cyclops") 
-  install_github("ohdsi/BrokenAdaptiveRidge") 
-  ```
+To install the latest stable version, install from CRAN:
 
-3. To perform a L_0-based Cyclops model fit, use the following commands in R:
+```r
+install.packages("BrokenAdaptiveRidge")
+```
 
-  ```r
-  library(BrokenAdaptiveRidge)
-  cyclopsData <- createCyclopsData(formula, modelType = "modelType") ## TODO: Update
-  barPrior    <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
-  cyclopsFit  <- fitCyclopsModel(cyclopsData, prior = barPrior)
-  coef(cyclopsFit) #Extract coefficients
-  ```
- 
-Getting Involved
-================
+User Documentation
+==================
+
+Documentation can be found on the [package website](https://ohdsi.github.io/BrokenAdaptiveRidge/).
+
+PDF versions of the documentation are also available:
+
 * Package manual: [BrokenAdaptiveRidge manual](https://raw.githubusercontent.com/OHDSI/BrokenAdaptiveRidge/master/extras/BrokenAdaptiveRidge.pdf) 
+
+Support
+=======
+
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
 * We use the <a href="https://github.com/OHDSI/BrokenAdaptiveRidge/issues">GitHub issue tracker</a> for all bugs/issues/enhancements 
 
 License
 =======
+
 `BrokenAdaptiveRidge` is licensed under Apache License 2.0.  
 
 Development
 ===========
+
 `BrokenAdaptiveRidge` is being developed in R Studio.
 
 Acknowledgements
 ================
-- This project is supported in part through the National Institutes of Health grant R01 HG006139.
 
+- This project is supported in part through the National Institutes of Health grant R01 HG006139.
