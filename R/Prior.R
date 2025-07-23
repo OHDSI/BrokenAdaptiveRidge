@@ -22,7 +22,7 @@
 #' @title Create a BAR Cyclops prior object
 #'
 #' @description
-#' \code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
+#' \code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
 #'
 #' @param penalty        Specifies the BAR penalty; possible values are `BIC` or `AIC` or a numeric value
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior

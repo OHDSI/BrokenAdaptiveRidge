@@ -37,7 +37,7 @@ A BAR Cyclops prior object of class inheriting from
 \code{"cyclopsPrior"} for use with \code{fitCyclopsModel}.
 }
 \description{
-\code{createFastBarPrior} creates a fastBAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
+\code{createFastBarPrior} creates a fastBAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
 }
 \examples{
 nobs = 500; ncovs = 100

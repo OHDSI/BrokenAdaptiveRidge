@@ -23,7 +23,7 @@
 #' @title Create a fastBAR Cyclops prior object
 #'
 #' @description
-#' \code{createFastBarPrior} creates a fastBAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
+#' \code{createFastBarPrior} creates a fastBAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
 #'
 #' @param penalty        Specifies the BAR penalty
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior

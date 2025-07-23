@@ -40,7 +40,7 @@ A BAR Cyclops prior object of class inheriting from
 \code{"cyclopsPrior"} for use with \code{fitCyclopsModel}.
 }
 \description{
-\code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link{fitCyclopsModel}}.
+\code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
 }
 \examples{
 prior <- createBarPrior(penalty = "bic")

@@ -7,5 +7,5 @@ extras
 cran-comments.md
 ^.Rd2
 ^CRAN-SUBMISSION$
-_pgkdown.yml
+_pkgdown.yml
 docs
