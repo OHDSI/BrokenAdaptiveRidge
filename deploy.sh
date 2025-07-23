@@ -3,6 +3,9 @@ set -o errexit -o nounset
 addToDrat(){
   PKG_REPO=$PWD
 
+  ## Build package tar ball
+  export PKG_TARBALL=$(ls *.tar.gz)
+
   cd ..; mkdir drat; cd drat
 
   ## Set up Repo parameters
@@ -16,13 +19,12 @@ addToDrat(){
   git fetch upstream 2>err.txt
   git checkout gh-pages
   
-  ## Install drat
-  mkdir -p ~/Rlib
+  ## Link to local R packages  
   echo 'R_LIBS=~/Rlib' > .Renviron
-  
+ 
   Rscript -e "drat::insertPackage('$PKG_REPO/$PKG_TARBALL', \
     repodir = '.', \
-    commit='Travis update: $PKG_TARBALL build $TRAVIS_BUILD_NUMBER')"
+    commit='GitHub Actions release: $PKG_TARBALL run $GITHUB_RUN_ID')"
   git push
 
 }
