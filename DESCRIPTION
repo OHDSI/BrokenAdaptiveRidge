@@ -1,8 +1,8 @@
 Package: BrokenAdaptiveRidge
 Type: Package
 Title: Broken Adaptive Ridge Regression with Cyclops
-Version: 1.0.0
-Date: 2023-04-05
+Version: 1.0.1
+Date: 2025-07-21
 Authors@R: c(
     person("Marc A.", "Suchard", email = "msuchard@ucla.edu", role = c("aut","cre")),
     person("Eric", "Kawaguchi", role = "aut"),

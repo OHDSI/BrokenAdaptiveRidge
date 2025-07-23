@@ -10,7 +10,7 @@ bibentry(bibtype = "Article",
         volume = "39",
         pages = "675-686",
         year = "2020",
-        url = "https://doi.org/10.1002/sim.8438"
+        doi = "10.1002/sim.8438"
 )
 
 bibentry(bibtype = "Article",
@@ -24,7 +24,7 @@ bibentry(bibtype = "Article",
         volume = "213",
         pages = "262-281",
         year = "2021",
-        url = "https://doi.org/10.1016/j.jspi.2020.12.001"
+        doi = "10.1016/j.jspi.2020.12.001"
 )
 
 bibentry(bibtype = "Article",
@@ -38,6 +38,6 @@ bibentry(bibtype = "Article",
         volume = "23",
         pages = "10",
         year = "2013",
-        url = "https://dl.acm.org/doi/10.1145/2414416.2414791"
+        doi = "10.1145/2414416.2414791"
 )
 
