@@ -98,7 +98,10 @@ fastBarHook <- function(fitBestSubset,
   working_coef <- coef(startFit)
   penalty <- getPenalty(cyclopsData, barPrior)
 
-  futile.logger::flog.trace("Initial penalty: %f", penalty)
+  if (length(ParallelLogger::getLoggers()) == 0) {
+    ParallelLogger::addDefaultConsoleLogger()
+  }
+  ParallelLogger::logDebug("Initial penalty: ", penalty)
 
   continue <- TRUE
   count <- 0
@@ -128,10 +131,10 @@ fastBarHook <- function(fitBestSubset,
     coef <- coef(fit)
 
     end <- min(10, length(variance))
-    futile.logger::flog.trace("Itr: %d", count)
-    futile.logger::flog.trace("\tVar : ", variance[1:end], capture = TRUE)
-    futile.logger::flog.trace("\tCoef: ", coef[1:end], capture = TRUE)
-    futile.logger::flog.trace("")
+    ParallelLogger::logDebug("Itr: ", count)
+    ParallelLogger::logDebug("\tVar : ", paste0(variance[1:end], sep = " "))
+    ParallelLogger::logDebug("\tCoef: ", paste0(coef[1:end], sep = " "))
+    ParallelLogger::logDebug("")
 
     #Check for convergence
     if (max(abs(coef - working_coef)) < tolerance) {

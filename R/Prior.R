@@ -24,7 +24,7 @@
 #' @description
 #' \code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
 #'
-#' @param penalty        Specifies the BAR penalty; possible values are `BIC`, `cBIC` or `AIC` or a numeric value
+#' @param penalty        Specifies the BAR penalty; possible values are `BIC` or `AIC` or a numeric value
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior
 #' @param forceIntercept Logical: Force intercept coefficient into regularization
 #' @param fitBestSubset  Logical: Fit final subset with no regularization
@@ -98,7 +98,10 @@ barHook <- function(fitBestSubset,
   pre_coef <- coef(startFit)
   penalty <- getPenalty(cyclopsData, barPrior)
 
-  futile.logger::flog.trace("Initial penalty: %f", penalty)
+  if (length(ParallelLogger::getLoggers()) == 0) {
+    ParallelLogger::addDefaultConsoleLogger()
+  }
+  ParallelLogger::logDebug("Initial penalty: ", penalty)
 
   continue <- TRUE
   count <- 0
@@ -127,10 +130,10 @@ barHook <- function(fitBestSubset,
     coef <- coef(fit)
 
     end <- min(10, length(variance))
-    futile.logger::flog.trace("Itr: %d", count)
-    futile.logger::flog.trace("\tVar : ", variance[1:end], capture = TRUE)
-    futile.logger::flog.trace("\tCoef: ", coef[1:end], capture = TRUE)
-    futile.logger::flog.trace("")
+    ParallelLogger::logDebug("Itr: ", count)
+    ParallelLogger::logDebug("\tVar : ", paste0(variance[1:end], sep = " "))
+    ParallelLogger::logDebug("\tCoef: ", paste0(coef[1:end], sep = " "))
+    ParallelLogger::logDebug("")
 
     if (max(abs(coef - pre_coef)) < tolerance) {
       converged <- TRUE
@@ -217,10 +220,6 @@ getPenalty <- function(cyclopsData, barPrior) {
 
   if (barPrior$penalty == "bic") {
     return(log(Cyclops::getNumberOfRows(cyclopsData)) / 2) # TODO Handle stratified models
-  } else if (barPrior$penalty == "cbic")
-    # TODO Check for survival-type model
-    # TODO Get number of non-censured events
-    stop("Not yet implemented")
   } else {
     stop("Unhandled BAR penalty type")
   }

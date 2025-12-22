@@ -22,7 +22,7 @@ Depends:
     R (>= 3.2.2),
     Cyclops (>= 3.0.0)
 Imports:
-    futile.logger,
+    ParallelLogger,
     bit64
 Suggests:
     testthat,

@@ -1,7 +1,13 @@
+BrokenAdaptiveRidge 1.0.2
+=============
+
+Changes: remove dependence on futile.logger
+
+
 BrokenAdaptiveRidge 1.0.1
 =============
 
-Changes: Fix documentation links to Cyclops
+Changes: fix documentation links to Cyclops
 
 
 BrokenAdaptiveRidge 1.0.0
