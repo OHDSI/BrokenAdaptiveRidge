@@ -1,0 +1,43 @@
+citHeader("To cite BrokenAdaptiveRidge in publications use:")
+
+bibentry(bibtype = "Article",
+        author = c( as.person("E. Kawaguchi"),
+                   as.person("M. A. Suchard"),
+                   as.person("Z. Liu"),
+                   as.person("G. Li")),
+        title = "A surrogate L0 sparse Cox regression with applications to sparse high-dimensional massive sample size time-to-event data",
+        journal = "Statistics in Medicine",
+        volume = "39",
+        pages = "675-686",
+        year = "2020",
+        doi = "10.1002/sim.8438"
+)
+
+bibentry(bibtype = "Article",
+        author = c(as.person("N. Li"),
+                   as.person("X. Peng"),
+                   as.person("E. Kawaguchi"),
+                   as.person("M. A. Suchard"),
+                   as.person("G. Li")),
+        title = "A scalable surrogate L0 sparse regression method for generalized linear models with applications to large scale data",
+        journal = "Journal of Statistical Planning and Inference",
+        volume = "213",
+        pages = "262-281",
+        year = "2021",
+        doi = "10.1016/j.jspi.2020.12.001"
+)
+
+bibentry(bibtype = "Article",
+        author = c(as.person("M. A. Suchard"),
+                   as.person("S. E. Simpson"),
+                   as.person("I. Zorych"),
+                   as.person("P. Ryan"),
+                   as.person("D. Madigan")),
+        title = "Massive parallelization of serial inference algorithms for complex generalized linear models",
+        journal = "ACM Transactions on Modeling and Computer Simulation",
+        volume = "23",
+        pages = "10",
+        year = "2013",
+        doi = "10.1145/2414416.2414791"
+)
+

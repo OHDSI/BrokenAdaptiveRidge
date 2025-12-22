@@ -1,4 +1,4 @@
-# @file Prior.R
+# @file fastBarPrior.R
 #
 # Copyright 2023 Observational Health Data Sciences and Informatics
 #
@@ -18,24 +18,25 @@
 #
 # @author Marc A. Suchard
 # @author Ning Li
+# @author Eric S. Kawaguchi
 
-#' @title Create a BAR Cyclops prior object
+#' @title Create a fastBAR Cyclops prior object
 #'
 #' @description
-#' \code{createBarPrior} creates a BAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
+#' \code{createFastBarPrior} creates a fastBAR Cyclops prior object for use with \code{\link[Cyclops]{fitCyclopsModel}}.
 #'
-#' @param penalty        Specifies the BAR penalty; possible values are `BIC`, `cBIC` or `AIC` or a numeric value
+#' @param penalty        Specifies the BAR penalty
 #' @param exclude        A vector of numbers or covariateId names to exclude from prior
 #' @param forceIntercept Logical: Force intercept coefficient into regularization
 #' @param fitBestSubset  Logical: Fit final subset with no regularization
 #' @param initialRidgeVariance Numeric: variance used for algorithm initiation
 #' @param tolerance Numeric: maximum abs change in coefficient estimates from successive iterations to achieve convergence
-#' @param maxIterations Numeric: maxium iterations to achieve convergence
-#' @param threshold     Numeric: absolute threshold at which to force coefficient to 0
-#' @param delta         Numeric: change from 2 in ridge norm dimension
+#' @param maxIterations Numeric: maximum iterations to achieve convergence
+#' @param threshold Numeric: absolute threshold at which to force coefficient to 0
 #'
 #' @examples
-#' prior <- createBarPrior(penalty = "bic")
+#' nobs = 500; ncovs = 100
+#' prior <- createFastBarPrior(penalty = log(ncovs), initialRidgeVariance = 1 / log(ncovs))
 #'
 #' @return
 #' A BAR Cyclops prior object of class inheriting from
@@ -44,38 +45,36 @@
 #' @import Cyclops
 #'
 #' @export
-createBarPrior <- function(penalty = "bic",
+createFastBarPrior <- function(penalty = 0,
                            exclude = c(),
                            forceIntercept = FALSE,
                            fitBestSubset = FALSE,
                            initialRidgeVariance = 1E4,
                            tolerance = 1E-8,
                            maxIterations = 1E4,
-                           threshold = 1E-6,
-                           delta = 0) {
+                           threshold = 1E-6) {
 
-    # TODO Check that penalty (and other arguments) is valid
+  # TODO Check that penalty (and other arguments) is valid
 
-    fitHook <- function(...) {
-      # closure to capture BAR parameters
-      barHook(fitBestSubset, initialRidgeVariance, tolerance,
-              maxIterations, threshold, delta, ...)
-    }
+  fitHook <- function(...) {
+    # closure to capture BAR parameters
+    fastBarHook(fitBestSubset, initialRidgeVariance, tolerance,
+            maxIterations, threshold, ...)
+  }
 
-    structure(list(penalty = penalty,
-                   exclude = exclude,
-                   forceIntercept = forceIntercept,
-                   fitHook = fitHook),
-              class = "cyclopsPrior")
+  structure(list(penalty = penalty,
+                 exclude = exclude,
+                 forceIntercept = forceIntercept,
+                 fitHook = fitHook),
+            class = "cyclopsPrior")
 }
 
 # Below are package-private functions
 
-barHook <- function(fitBestSubset,
+fastBarHook <- function(fitBestSubset,
                     initialRidgeVariance,
                     tolerance,
                     maxIterations,
-                    cutoff,
                     delta,
                     cyclopsData,
                     barPrior,
@@ -92,10 +91,11 @@ barHook <- function(fitBestSubset,
                                                                                    forceIntercept = barPrior$forceIntercept,
                                                                                    initialRidgeVariance = initialRidgeVariance),
                                        control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
-  priorType <- createBarPriorType(cyclopsData, barPrior$exclude, barPrior$forceIntercept)
+
+  priorType <- createFastBarPriorType(cyclopsData, barPrior$exclude, barPrior$forceIntercept)
   include <- setdiff(c(1:Cyclops::getNumberOfCovariates(cyclopsData)), priorType$excludeIndices)
 
-  pre_coef <- coef(startFit)
+  working_coef <- coef(startFit)
   penalty <- getPenalty(cyclopsData, barPrior)
 
   futile.logger::flog.trace("Initial penalty: %f", penalty)
@@ -103,27 +103,28 @@ barHook <- function(fitBestSubset,
   continue <- TRUE
   count <- 0
   converged <- FALSE
+  variance <- rep(1 / penalty, getNumberOfCovariates(cyclopsData)) #Create penalty for each covariate.
+
   while (continue) {
     count <- count + 1
 
-    working_coef <- ifelse(abs(pre_coef) <= cutoff, 0.0, pre_coef)
-    fixed <- working_coef == 0.0
-    variance <- abs(working_coef) ^ (2 - delta) / penalty
-
+    #Note: Don't fix zeros as zero for next iteration.
+    #fixed <- working_coef == 0.0
     if (!is.null(priorType$excludeIndices)) {
-      working_coef[priorType$excludeIndices] <- pre_coef[priorType$excludeIndices]
-      fixed[priorType$excludeIndices] <- FALSE
+      working_coef[priorType$excludeIndices]
+      #fixed[priorType$excludeIndices] <- FALSE
       variance[priorType$excludeIndices] <- 0
     }
 
     prior <- Cyclops::createPrior(priorType$types, variance = variance,
                                   forceIntercept = barPrior$forceIntercept)
-
+    #Fit fastBAR for one epoch
     fit <- Cyclops::fitCyclopsModel(cyclopsData,
                                     prior = prior,
-                                    control, weights, forceNewObject,
-                                    startingCoefficients = working_coef,
-                                    fixedCoefficients = fixed)
+                                    control = createControl(convergenceType = "onestep"),
+                                    weights, forceNewObject,
+                                    startingCoefficients = working_coef)
+
     coef <- coef(fit)
 
     end <- min(10, length(variance))
@@ -132,10 +133,11 @@ barHook <- function(fitBestSubset,
     futile.logger::flog.trace("\tCoef: ", coef[1:end], capture = TRUE)
     futile.logger::flog.trace("")
 
-    if (max(abs(coef - pre_coef)) < tolerance) {
+    #Check for convergence
+    if (max(abs(coef - working_coef)) < tolerance) {
       converged <- TRUE
     } else {
-      pre_coef <- coef
+      working_coef <- coef
     }
 
     if (converged || count >= maxIterations) {
@@ -151,28 +153,21 @@ barHook <- function(fitBestSubset,
 
   if (fitBestSubset) {
     fit <- Cyclops::fitCyclopsModel(cyclopsData, prior = createPrior("none"),
-                                    control, weights, forceNewObject, fixedCoefficients = fixed)
+                                    control, weights, forceNewObject, fixedCoefficients = (working_coef == 0))
   }
 
-  class(fit) <- c(class(fit), "cyclopsBarFit")
+  class(fit) <- c(class(fit), "cyclopsFastBarFit")
   fit$barConverged <- converged
   fit$barIterations <- count
+  fit$penalty <- penalty
   fit$barFinalPriorVariance <- variance
 
   return(fit)
 }
 
-createBarStartingPrior <- function(cyclopsData,
+createFastBarPriorType <- function(cyclopsData,
                                    exclude,
-                                   forceIntercept,
-                                   initialRidgeVariance) {
-
-  Cyclops::createPrior("normal", variance = initialRidgeVariance, exclude = exclude, forceIntercept = forceIntercept)
-}
-
-createBarPriorType <- function(cyclopsData,
-                               exclude,
-                               forceIntercept) {
+                                   forceIntercept) {
 
   exclude <- Cyclops:::.checkCovariates(cyclopsData, exclude)
 
@@ -199,7 +194,8 @@ createBarPriorType <- function(cyclopsData,
     indices <- which(covariateIds %in% exclude)
   }
 
-  types <- rep("normal", Cyclops::getNumberOfCovariates(cyclopsData))
+  # "Unpenalize" excluded covariates
+  types <- rep("barupdate", Cyclops::getNumberOfCovariates(cyclopsData))
   if (!is.null(exclude)) {
     types[indices] <- "none"
   }
@@ -209,19 +205,14 @@ createBarPriorType <- function(cyclopsData,
        excludeIndices = indices)
 }
 
-getPenalty <- function(cyclopsData, barPrior) {
 
-  if (is.numeric(barPrior$penalty)) {
-    return(barPrior$penalty)
-  }
 
-  if (barPrior$penalty == "bic") {
-    return(log(Cyclops::getNumberOfRows(cyclopsData)) / 2) # TODO Handle stratified models
-  } else if (barPrior$penalty == "cbic")
-    # TODO Check for survival-type model
-    # TODO Get number of non-censured events
-    stop("Not yet implemented")
-  } else {
-    stop("Unhandled BAR penalty type")
-  }
-}
+#Same as Prior.R
+#createBarStartingPrior <- function(cyclopsData,
+#                                   exclude,
+#                                   forceIntercept,
+#                                   initialRidgeVariance) {
+#
+#  Cyclops::createPrior("normal", variance = initialRidgeVariance, exclude = exclude, forceIntercept = forceIntercept)
+#}
+

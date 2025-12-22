@@ -1,101 +1,128 @@
 BrokenAdaptiveRidge
-=======
+===================
 
-<!--
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/Cyclops)](https://CRAN.R-project.org/package=Cyclops)
--->
+[![Build Status](https://github.com/ohdsi/BrokenAdaptiveRidge/workflows/R-CMD-check/badge.svg)](https://github.com/OHDSI/BrokenAdaptiveRidge/actions?query=workflow%3AR-CMD-check)
+[![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=main)](https://app.codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=main)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/BrokenAdaptiveRidge)](https://cran.r-project.org/package=BrokenAdaptiveRidge)
+[![CRAN_Status_Badge](http://cranlogs.r-pkg.org/badges/BrokenAdaptiveRidge)](https://cran.r-project.org/package=BrokenAdaptiveRidge)
+
+BrokenAdaptiveRidge is part of [HADES](https://ohdsi.github.io/Hades/).
+
 
 Introduction
 ============
 
-BrokenAdaptiveRidge is an `R` package for performing L_0-based regressions using `Cyclops`
-
-Features
-========
+`BrokenAdaptiveRidge` is an `R` package for performing L_0-based regressions using `Cyclops`
 
 Examples
 ========
- * Cox's Proportional Hazards Model
+
+* Generalized Linear Model
  ```r
- library(Cyclops)
- library(BrokenAdaptiveRidge)
- library(survival)
- 
-pbc.cc        <- pbc[complete.cases(pbc), ] #Extract only complete cases
-pbc.cc$sex    <- ifelse(pbc.cc$sex == "f", 1, 0) #Change sex to a numeric
-pbc.cc$trt    <- ifelse(pbc.cc$trt == 2, 1, 0) #Change trt from (1, 2) to (0, 1)
-pbc.cc$status <- ifelse(status == 2, 1, 0) #Change censoring definition to transplant/dead (1) vs. censored (0)
-time          <- pbc.cc$time 
-status        <- pbc.cc$status
-X             <- pbc.cc[, 4:20]
-X             <- scale(as.matrix(X)) #Standardize the covariate matrix, X.
+library(Cyclops)
+library(BrokenAdaptiveRidge)
 
-#- Tuning Parameters:
-xi     <- 1 #Initial ridge penalty
-lambda <- log(dim(X)[1]) #BAR penalty (corresponds to BIC-type penalty)
+## data dimension
+p <- 30    # number of covariates
+n <- 200   # sample size
 
-dataFit  <- createCyclopsData(Surv(time, status) ~ X, modelType = "cox")
-barPrior <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
-fit      <- fitCyclopsModel(dataFit, prior = barPrior)
-coef(fit) #Extract coefficients
+## logistic model parameters 
+itcpt     <- 0.2 # intercept
+true.beta <- c(1, 0, 0, -1, 1, rep(0, p - 5))
+
+## simulate data from logistic model
+set.seed(100)
+
+x <- matrix(rnorm(p * n, mean = 0, sd = 1), ncol = p)
+x <- ifelse(abs(x) > 1., 1, 0)
+y <- rbinom(n, 1, 1 / (1 + exp(-itcpt - x%*%true.beta)))
+
+
+# fit BAR model
+cyclopsData <- createCyclopsData(y ~ x, modelType = "lr")
+barPrior    <- createBarPrior(penalty = 0.1, exclude = c("(Intercept)"), 
+                              initialRidgeVariance = 1) 
+
+cyclopsFit <- fitCyclopsModel(cyclopsData,
+                              prior = barPrior)
+fit1 <- coef(cyclopsFit) 
+
+# fit BAR using sparse-represented covariates
+tmp <- apply(x, 1, function(x) which(x != 0))
+
+y.df <- data.frame(rowId = 1:n, y = y)
+x.df <- data.frame(rowId = rep(1:n, lengths(tmp)), covariateId = unlist(tmp), covariateValue = 1)
+
+cyclopsData <- convertToCyclopsData(outcomes = y.df, covariates = x.df, modelType = "lr")
+barPrior    <- createFastBarPrior(penalty = 0.1, exclude = c("(Intercept)"), 
+                                  initialRidgeVariance = 1) 
+
+fit2 <- coef(cyclopsFit) 
+
+# fit BAR using cyclic algorithm
+cyclopsData <- createCyclopsData(y ~ x, modelType = "lr")
+barPrior    <- createFastBarPrior(penalty = 0.1, exclude = c("(Intercept)"), 
+                              initialRidgeVariance = 1) 
+
+cyclopsFit <- fitCyclopsModel(cyclopsData,
+                              prior = barPrior)
+fit3 <- coef(cyclopsFit) 
+
+fit1
+fit2
+fit3
  ```
- 
+
 Technology
-============
+==========
+
+BrokenAdaptiveRidge is an R package.
 
 System Requirements
 ===================
-Requires `R` (version 3.2.0 or higher). Installation on Windows requires [RTools]( https://CRAN.R-project.org/bin/windows/Rtools/) (`devtools >= 1.12` required for RTools34, otherwise RTools33 works fine).
+
+Requires `R` (version 3.2.0 or higher).
 
 Dependencies
 ============
+
  * `Cyclops`
 
-Getting Started
-===============
-1. On Windows, make sure [RTools](https://CRAN.R-project.org/bin/windows/Rtools/) is installed.
-2. In R, use the following commands to download and install BrokenAdaptiveRidge:
+Installation
+============
 
-  ```r
-  install.packages("devtools")
-  library(devtools)
-  install_github("ohdsi/Cyclops") 
-  install_github("ohdsi/BrokenAdaptiveRidge") 
-  ```
+To install the latest stable version, install from CRAN:
 
-3. To perform a L_0-based Cyclops model fit, use the following commands in R:
+```r
+install.packages("BrokenAdaptiveRidge")
+```
 
-  ```r
-  library(BrokenAdaptiveRidge)
-  cyclopsData <- createCyclopsData(formula, modelType = "modelType") ## TODO: Update
-  barPrior    <- createBarPrior(penalty = lambda / 2, initialRidgeVariance = 2 / xi) 
-  cyclopsFit  <- fitCyclopsModel(cyclopsData, prior = barPrior)
-  coef(cyclopsFit) #Extract coefficients
-  ```
- 
-Getting Involved
-================
+User Documentation
+==================
+
+Documentation can be found on the [package website](https://ohdsi.github.io/BrokenAdaptiveRidge/).
+
+PDF versions of the documentation are also available:
+
 * Package manual: [BrokenAdaptiveRidge manual](https://raw.githubusercontent.com/OHDSI/BrokenAdaptiveRidge/master/extras/BrokenAdaptiveRidge.pdf) 
+
+Support
+=======
+
 * Developer questions/comments/feedback: <a href="http://forums.ohdsi.org/c/developers">OHDSI Forum</a>
-* We use the <a href="../../issues">GitHub issue tracker</a> for all bugs/issues/enhancements
- 
+* We use the <a href="https://github.com/OHDSI/BrokenAdaptiveRidge/issues">GitHub issue tracker</a> for all bugs/issues/enhancements 
+
 License
 =======
-BrokenAdaptiveRidge is licensed under Apache License 2.0.  
+
+`BrokenAdaptiveRidge` is licensed under Apache License 2.0.  
 
 Development
 ===========
-BrokenAdaptiveRidge is being developed in R Studio.
 
-### Development status
-
-[![Build Status](https://travis-ci.org/OHDSI/BrokenAdaptiveRidge.svg?branch=master)](https://travis-ci.org/OHDSI/BrokenAdaptiveRidge)
-[![codecov.io](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge/coverage.svg?branch=master)](https://codecov.io/github/OHDSI/BrokenAdaptiveRidge?branch=master)
-
-Beta
+`BrokenAdaptiveRidge` is being developed in R Studio.
 
 Acknowledgements
 ================
-- This project is supported in part through the National Science Foundation grants IIS 1251151 and DMS 1264153.
 
-
+- This project is supported in part through the National Institutes of Health grant R01 HG006139.

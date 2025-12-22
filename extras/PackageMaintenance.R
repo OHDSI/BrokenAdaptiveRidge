@@ -1,6 +1,6 @@
 # @file PackageMaintenance
 #
-# Copyright 2017 Observational Health Data Sciences and Informatics
+# Copyright 2023 Observational Health Data Sciences and Informatics
 #
 # This file is part of BrokenAdaptiveRidge
 #
@@ -22,12 +22,13 @@ OhdsiRTools::checkUsagePackage("BrokenAdaptiveRidge")
 OhdsiRTools::updateCopyrightYearFolder()
 
 # Create manual and vignettes:
-shell("rm extras/BrokenAdaptiveRidge.pdf")
-shell("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
+if (.Platform$OS.type == "unix") {
+  system("rm extras/BrokenAdaptiveRidge.pdf")
+  system("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
+} else {
+  unlink("extras/BrokenAdaptiveRidge.pdf")
+  shell("R CMD Rd2pdf ./ --output=extras/BrokenAdaptiveRidge.pdf")
+}
 
-# rmarkdown::render("vignettes/SingleStudies.Rmd",
-#                   output_file = "../inst/doc/SingleStudies.pdf",
-#                   rmarkdown::pdf_document(latex_engine = "pdflatex",
-#                                           toc = TRUE,
-#                                           number_sections = TRUE))
-
+pkgdown::build_site()
+OhdsiRTools::fixHadesLogo()

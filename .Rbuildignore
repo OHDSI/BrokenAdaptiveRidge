@@ -1,5 +1,11 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-.travis.yml
+.github
 deploy.sh
+compare_versions
 extras
+cran-comments.md
+^.Rd2
+^CRAN-SUBMISSION$
+_pkgdown.yml
+docs
