@@ -92,6 +92,10 @@ barHook <- function(fitBestSubset,
                                                                                    forceIntercept = barPrior$forceIntercept,
                                                                                    initialRidgeVariance = initialRidgeVariance),
                                        control, weights, forceNewObject, returnEstimates, startingCoefficients, fixedCoefficients)
+
+  # Honor forceNewObject for initial ridge fit, then reuse the optimizer for BAR iterations.
+  forceNewObject <- FALSE
+
   priorType <- createBarPriorType(cyclopsData, barPrior$exclude, barPrior$forceIntercept)
   include <- setdiff(c(1:Cyclops::getNumberOfCovariates(cyclopsData)), priorType$excludeIndices)
 
